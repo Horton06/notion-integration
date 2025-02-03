@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node createCampaignEvents.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "vercel-build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -12,10 +13,11 @@
   "description": "",
   "dependencies": {
     "@notionhq/client": "^2.2.15",
-    "@vercel/node": "^5.1.0",
+    "@vercel/node": "^4.0.0",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
-    "node-cron": "^3.0.3"
+    "node-cron": "^3.0.3",
+    "undici": "^7.3.0"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
