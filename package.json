@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node createCampaignEvents.ts",
-    "build": "tsc",
-    "vercel-build": "echo 'Building serverless functions'"
+    "build": "tsc --outDir api",
+    "vercel-build": "tsc --outDir api"
   },
   "keywords": [],
   "author": "",
