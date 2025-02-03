@@ -19,7 +19,10 @@
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
+<<<<<<< HEAD
     "@types/node-cron": "^3.0.11",
+=======
+>>>>>>> 2784a940e3a7b6120797cfd90d5290aa6feb3567
     "ts-node": "^10.0.0",
     "typescript": "^4.0.0"
   }
