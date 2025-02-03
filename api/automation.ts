@@ -181,8 +181,6 @@ cron.schedule('*/5 * * * *', () => {
 });
 
 // API Handler for Vercel
-import { checkAndProcessCampaigns } from '../services/campaignService';
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     await checkAndProcessCampaigns();
