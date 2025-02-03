@@ -1,8 +1,10 @@
 {
   "version": 2,
+  "buildCommand": "npm run build",
   "functions": {
     "api/**/*.ts": {
-      "runtime": "@vercel/node@4.0.0"
+      "runtime": "@vercel/node@4.0.0",
+      "memory": 1024
     }
   },
   "routes": [
@@ -11,5 +13,5 @@
       "dest": "/api/$1"
     }
   ],
-  "outputDirectory": "api"
+  "public": false
 }

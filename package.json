@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node createCampaignEvents.ts",
-    "build": "tsc || exit 0",
-    "vercel-build": "tsc || exit 0"
+    "build": "tsc",
+    "vercel-build": "echo 'Building serverless functions'"
   },
   "keywords": [],
   "author": "",

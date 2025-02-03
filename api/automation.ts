@@ -182,3 +182,17 @@ cron.schedule('*/5 * * * *', () => {
 
 // Optionally, run the check immediately for initial testing.
 checkAndProcessCampaigns();
+
+/**
+ * Serverless function handler.
+ * This endpoint will run when triggered and return a simple JSON response.
+ */
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  try {
+    await checkAndProcessCampaigns();
+    res.status(200).json({ message: 'Automation triggered successfully.' });
+  } catch (error) {
+    console.error('Automation encountered an error:', error);
+    res.status(500).json({ message: 'Automation encountered an error.' });
+  }
+}
