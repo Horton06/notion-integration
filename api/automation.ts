@@ -180,5 +180,16 @@ cron.schedule('*/5 * * * *', () => {
   );
 });
 
+// API Handler for Vercel
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  try {
+    await checkAndProcessCampaigns();
+    res.status(200).json({ message: 'Automation triggered successfully.' });
+  } catch (error) {
+    console.error('Automation error:', error);
+    res.status(500).json({ message: 'Error triggering automation.' });
+  }
+}
+
 // Optionally, run the check immediately for initial testing.
 checkAndProcessCampaigns();
