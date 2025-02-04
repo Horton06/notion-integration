@@ -9,6 +9,7 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY });
 const campaignsDbId = process.env.CAMPAIGNS_DB_ID!;
 const campaignEventsDbId = process.env.CAMPAIGN_EVENTS_DB_ID!;
 
+// Define the configuration for events (if you plan to use these later)
 interface EventConfig {
   daysOffset: number;
   eventType: string;
@@ -16,55 +17,55 @@ interface EventConfig {
 }
 
 const EVENT_CONFIG: EventConfig[] = [
-    // Universal Events (applies to all campaigns)
-    { daysOffset: -21, eventType: 'Brief Date', applicableTypes: ['*'] },
-    { daysOffset: -28, eventType: 'Planning Date 1', applicableTypes: ['*'] },
-  
-    // Campaign-Specific Events
-    { 
-      daysOffset: -42, 
-      eventType: 'Planning Date 2',
-      applicableTypes: ['Drink Launch', 'Bake Launch', 'Lab Events', 'Lab Promotions']
-    },
-    {
-      daysOffset: -7,
-      eventType: 'Marketing 1 Date',
-      applicableTypes: [
-        'Drink Launch', 'Bake Launch', 'Lab Events', 
-        'Lab Promotions', 'Workshops', 'Hours Change', 'Startup City'
-      ]
-    },
-    {
-      daysOffset: -14,
-      eventType: 'Marketing 2 Date',
-      applicableTypes: ['Lab Events', 'Lab Promotions', 'Workshops']
-    },
-    {
-      daysOffset: -21,
-      eventType: 'Marketing 3 Date',
-      applicableTypes: ['Lab Events', 'Lab Promotions', 'Workshops']
-    },
-    {
-      daysOffset: -14,
-      eventType: 'Ingredient Purchase Date',
-      applicableTypes: ['Bake Launch', 'Drink Launch', 'Workshops']
-    },
-    {
-      daysOffset: -10,
-      eventType: 'Staff Training Date',
-      applicableTypes: ['Bake Launch', 'Drink Launch', 'Workshops']
-    },
-    {
-      daysOffset: -14,
-      eventType: 'Newsletter Draft Date',
-      applicableTypes: ['Newsletter']
-    },
-    {
-      daysOffset: 7,
-      eventType: 'Followup',
-      applicableTypes: ['Lab Promotions', 'Lab Events', 'Newsletter']
-    }
-  ];
+  // Universal Events (applies to all campaigns)
+  { daysOffset: -21, eventType: 'Brief Date', applicableTypes: ['*'] },
+  { daysOffset: -28, eventType: 'Planning Date 1', applicableTypes: ['*'] },
+
+  // Campaign-Specific Events
+  { 
+    daysOffset: -42, 
+    eventType: 'Planning Date 2',
+    applicableTypes: ['Drink Launch', 'Bake Launch', 'Lab Events', 'Lab Promotions']
+  },
+  {
+    daysOffset: -7,
+    eventType: 'Marketing 1 Date',
+    applicableTypes: [
+      'Drink Launch', 'Bake Launch', 'Lab Events', 
+      'Lab Promotions', 'Workshops', 'Hours Change', 'Startup City'
+    ]
+  },
+  {
+    daysOffset: -14,
+    eventType: 'Marketing 2 Date',
+    applicableTypes: ['Lab Events', 'Lab Promotions', 'Workshops']
+  },
+  {
+    daysOffset: -21,
+    eventType: 'Marketing 3 Date',
+    applicableTypes: ['Lab Events', 'Lab Promotions', 'Workshops']
+  },
+  {
+    daysOffset: -14,
+    eventType: 'Ingredient Purchase Date',
+    applicableTypes: ['Bake Launch', 'Drink Launch', 'Workshops']
+  },
+  {
+    daysOffset: -10,
+    eventType: 'Staff Training Date',
+    applicableTypes: ['Bake Launch', 'Drink Launch', 'Workshops']
+  },
+  {
+    daysOffset: -14,
+    eventType: 'Newsletter Draft Date',
+    applicableTypes: ['Newsletter']
+  },
+  {
+    daysOffset: 7,
+    eventType: 'Followup',
+    applicableTypes: ['Lab Promotions', 'Lab Events', 'Newsletter']
+  }
+];
 
 /**
  * Query the Campaigns database for new campaigns.
@@ -90,19 +91,17 @@ async function getNewCampaigns() {
 
 /**
  * Process a single campaign by creating subsequent events and marking the campaign as processed.
- * @param campaignPage The Notion page (campaign) object
  */
 async function processCampaign(campaignPage: any) {
   try {
-    // Extract information from the campaign page.
-    // Ensure that the property names match exactly those in your Campaigns database.
+    // Extract campaign name from the page properties
     const campaignTitleProperty = campaignPage.properties['Campaign Name'];
     const campaignName =
       campaignTitleProperty?.title?.[0]?.plain_text || 'Unnamed Campaign';
 
     console.log(`Processing campaign: ${campaignName}`);
 
-    // Define subsequent events (this is an example—customize as needed).
+    // Define subsequent events – customize as needed
     const subsequentEvents = [
       { eventName: `${campaignName} - Kickoff`, date: '2025-02-20', eventType: 'Kickoff' },
       { eventName: `${campaignName} - Follow-Up`, date: '2025-03-05', eventType: 'Follow-Up' },
@@ -121,21 +120,13 @@ async function processCampaign(campaignPage: any) {
             ],
           },
           'Date': {
-            date: {
-              start: event.date,
-            },
+            date: { start: event.date },
           },
           'Event Type': {
-            select: {
-              name: event.eventType,
-            },
+            select: { name: event.eventType },
           },
           'Related Campaign': {
-            relation: [
-              {
-                id: campaignPage.id,
-              },
-            ],
+            relation: [{ id: campaignPage.id }],
           },
         },
       });
@@ -172,19 +163,36 @@ export async function checkAndProcessCampaigns() {
   }
 }
 
-// Schedule the job to run every 5 minutes.
-// You can adjust the cron pattern as needed.
-cron.schedule('*/5 * * * *', () => {
-  checkAndProcessCampaigns().catch(error =>
-    console.error('Error in scheduled task:', error)
-  );
-});
+// For local development only: schedule the task internally using node-cron.
+// In production, use Vercel Cron Jobs as specified in your vercel.json.
+if (process.env.NODE_ENV !== 'production') {
+  cron.schedule('*/5 * * * *', () => {
+    checkAndProcessCampaigns().catch((error) =>
+      console.error('Error in scheduled task:', error)
+    );
+  });
+}
 
-// API Handler for Vercel
+/**
+ * API Handler for Vercel:
+ * When this endpoint is invoked (by Vercel Cron Jobs or manually),
+ * it triggers the processing of new campaigns.
+ */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Secure this endpoint using the CRON_SECRET.
+  if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).end('Unauthorized');
+  }
+  const startTime = Date.now();
   try {
     await checkAndProcessCampaigns();
-    res.status(200).json({ message: 'Automation triggered successfully.' });
+    const duration = Date.now() - startTime;
+    console.log(`Automation executed in ${duration}ms at ${new Date().toISOString()}`);
+    res.status(200).json({ 
+      message: 'Automation triggered successfully.', 
+      duration,
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
     console.error('Automation error:', error);
     res.status(500).json({ message: 'Error triggering automation.' });

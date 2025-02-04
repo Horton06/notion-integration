@@ -5,7 +5,7 @@
   "scripts": {
     "start": "ts-node src/createCampaignEvents.ts",
     "build": "tsc",
-    "vercel-build": "chmod +x ./node_modules/.bin/tsc && tsc --outDir api",
+    "vercel-build": "shx chmod +x ./node_modules/.bin/tsc && tsc --outDir api",
     "dev": "ts-node src/api/cron.ts",
     "local-dev": "ts-node -r dotenv/config src/api/cron.ts"
   },
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@types/node": "^18.0.0",
     "@types/node-cron": "^3.0.11",
+    "shx": "^0.3.4",
     "ts-node": "^10.0.0"
   }
 }

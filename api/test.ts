@@ -8,7 +8,7 @@ const campaignsDbId = process.env.CAMPAIGNS_DB_ID!;
 
 async function testConnection() {
   try {
-    // Test database access
+    // Test database access: query for one entry
     const response = await notion.databases.query({
       database_id: campaignsDbId,
       page_size: 1
@@ -18,7 +18,7 @@ async function testConnection() {
     console.log('Database access verified');
     console.log(`Found ${response.results.length} entries`);
     
-    // Log the properties of the first item to verify structure
+    // If there is at least one entry, log the keys of its properties
     if (response.results.length > 0) {
       console.log('\nSample entry properties:');
       const page = response.results[0];
