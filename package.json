@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node createCampaignEvents.ts",
-    "build": "tsc --outDir api",
-    "vercel-build": "tsc --outDir api"
+    "start": "ts-node src/createCampaignEvents.ts",
+    "build": "tsc",
+    "vercel-build": "chmod +x ./node_modules/.bin/tsc && tsc --outDir api",
+    "dev": "ts-node src/api/cron.ts",
+    "local-dev": "ts-node -r dotenv/config src/api/cron.ts"
   },
   "keywords": [],
   "author": "",
