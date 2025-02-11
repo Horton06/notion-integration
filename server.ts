@@ -1,15 +1,28 @@
-import http from 'http';
-import { handler } from './api/cron';
+import express from 'express';
+import { Client } from '@notionhq/client';
+import dotenv from 'dotenv';
 
-const server = http.createServer((req, res) => {
-  if (req.url === '/api/cron' && req.headers['cron-secret'] === process.env.CRON_SECRET) {
-    return handler(req as any, res as any);
+dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+const notion = new Client({ auth: process.env.NOTION_API_KEY });
+
+app.use(express.json());
+
+app.post('/api/campaign', async (req, res) => {
+  const { campaignPageId } = req.body;
+
+  try {
+    const page = await notion.pages.retrieve({ page_id: campaignPageId });
+    res.status(200).json(page);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: "Failed to retrieve page" });
   }
-  res.writeHead(404);
-  res.end('Not found');
 });
 
-const port = process.env.PORT || 3000;
-server.listen(port, () => {
-  console.log(`Development server running on http://localhost:${port}`);
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
